@@ -24,98 +24,72 @@
  */
 package net.runelite.client.plugins;
 
-import com.google.inject.Binder;
-import com.google.inject.CreationException;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.runelite.client.RuneLite;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PluginClassLoader extends URLClassLoader
 {
     
-    private final PluginLoader loader;
-    final Plugin plugin;
-    private final File dataFolder;
-    private final File file;
+    private final PluginManager manager;
     private final Map<String, Class<?>> classes = new HashMap<>();
+    private final List<Class<? extends Plugin>> pluginClasses = new ArrayList<>();
     
-    public PluginClassLoader(final PluginLoader loader, final ClassLoader parent, final File dataFolder, final File file) throws MalformedURLException, InvalidPluginException {
-        super(new URL[] {file.toURI().toURL()}, parent);
+    public PluginClassLoader(final PluginManager manager, final ClassLoader parent, final File jarFile) throws MalformedURLException, InvalidPluginException {
+        super(new URL[] {jarFile.toURI().toURL()}, parent);
 
-        this.loader = loader;
-        this.dataFolder = dataFolder;
-        this.file = file;
+        this.manager = manager;
+        JarFile jar;
 
-        try {
-            Class<?> jarClass;
-            try {
-                jarClass = Class.forName("me.killje.climbcontext.ClimbContext", true, this);
-            } catch (ClassNotFoundException ex) {
-                throw new InvalidPluginException("Cannot find main class `me.killje.climbcontext.ClimbContext`", ex);
-            }
-
-            PluginDescriptor pluginDescriptor = jarClass.getAnnotation(PluginDescriptor.class);
-            if (pluginDescriptor == null)
-			{
-                throw new InvalidPluginException("Plugin does not have a descriptor");
-            }
-            
-            Class<? extends Plugin> pluginClass;
-            try {
-                pluginClass = jarClass.asSubclass(Plugin.class);
-            } catch (ClassCastException ex) {
-                throw new InvalidPluginException("main class `me.killje.climbcontext.ClimbContext` does not extend Plugin", ex);
-            }
-            
-            plugin = instantiate((Class<Plugin>) pluginClass);
-        } catch (PluginInstantiationException ex)
+        try
         {
-            throw new InvalidPluginException("Could not start plugin", ex);
+            jar = new JarFile(jarFile);
+        } catch (IOException ex)
+        {
+            throw new InvalidPluginException("Could not open the jar folder for: `" + jarFile.getName() + "`", ex);
         }
+
+        for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements();)
+        {
+            
+            JarEntry entry = entries.nextElement();
+            String entryName = entry.getName();
+            if (!entryName.endsWith(".class")) {
+                continue;
+            }
+            
+            String classname = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+            try
+            {
+                Class<?> clazz = Class.forName(classname, true, this);
+                
+                if (manager.isPluginClass(clazz)) {
+                    pluginClasses.add((Class<Plugin>) clazz);
+                }
+            } catch (ClassNotFoundException ex)
+            {
+                log.warn("Failed to load class `{}` from {}", classname, jarFile.getName());
+            }
+            
+        }
+        
     }
-    
-    private Plugin instantiate(Class<Plugin> clazz) throws PluginInstantiationException
-	{
-		Plugin plugin;
-		try
-		{
-			plugin = clazz.newInstance();
-		}
-		catch (InstantiationException | IllegalAccessException ex)
-		{
-			throw new PluginInstantiationException(ex);
-		}
 
-		try
-		{
-			Module pluginModule = (Binder binder) ->
-			{
-				binder.bind(clazz).toInstance(plugin);
-				binder.install(plugin);
-			};
-			Injector pluginInjector = RuneLite.getInjector().createChildInjector(pluginModule);
-			pluginInjector.injectMembers(plugin);
-			plugin.injector = pluginInjector;
-		}
-		catch (CreationException ex)
-		{
-			throw new PluginInstantiationException(ex);
-		}
-
-		return plugin;
-	}
+    public List<Class<? extends Plugin>> getPluginClasses()
+    {
+        return pluginClasses;
+    }
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
@@ -127,14 +101,14 @@ public class PluginClassLoader extends URLClassLoader
 
         if (result == null) {
             if (checkGlobal) {
-                result = loader.getClassByName(name);
+                result = manager.getClassByName(name);
             }
 
             if (result == null) {
                 result = super.findClass(name);
 
                 if (result != null) {
-                    loader.setClass(name, result);
+                    manager.setClass(name, result);
                 }
             }
 
@@ -142,14 +116,6 @@ public class PluginClassLoader extends URLClassLoader
         }
 
         return result;
-    }
-
-    Set<String> getClasses() {
-        return classes.keySet();
-    }
-
-    synchronized void initialize(Plugin Plugin) throws Exception {
-        plugin.startUp();
     }
     
 }

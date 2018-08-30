@@ -45,14 +45,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -97,6 +96,8 @@ public class PluginManager
 	private final Provider<SceneTileManager> sceneTileManager;
 	private final List<Plugin> plugins = new CopyOnWriteArrayList<>();
 	private final List<Plugin> activePlugins = new CopyOnWriteArrayList<>();
+    private final Map<String, Class<?>> classes = new HashMap<>();
+    private final Map<String, PluginClassLoader> loaders = new LinkedHashMap<>();
 	private final String runeliteGroupName = RuneLiteConfig.class
 			.getAnnotation(ConfigGroup.class).value();
 
@@ -203,14 +204,9 @@ public class PluginManager
 
 	public void loadCorePlugins() throws IOException
 	{
-		plugins.addAll(scanAndInstantiate(getClass().getClassLoader(), PLUGIN_PACKAGE));
-        try
-        {
-            plugins.addAll(loadExternalFolder(new File("plugins").getAbsoluteFile()));
-        } catch (InvalidPluginException ex)
-        {
-            Logger.getLogger(PluginManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<Class<? extends Plugin>> scannedPlugins = scanPlugins(getClass().getClassLoader(), PLUGIN_PACKAGE);
+        scannedPlugins.addAll(scanExternalFolder(getClass().getClassLoader(), new File("plugins").getAbsoluteFile()));
+		plugins.addAll(instantiatePlugins(scannedPlugins));
 	}
 
 	public void startCorePlugins()
@@ -229,55 +225,72 @@ public class PluginManager
 			}
 		}
 	}
-
-	List<Plugin> scanAndInstantiate(ClassLoader classLoader, String packageName) throws IOException
-	{
-		MutableGraph<Class<? extends Plugin>> graph = GraphBuilder
-			.directed()
-			.build();
-
-		List<Plugin> scannedPlugins = new ArrayList<>();
+    
+    List<Class<? extends Plugin>> scanPlugins(ClassLoader classLoader, String packageName) throws IOException {
+        List<Class<? extends Plugin>> scannedPlugins = new ArrayList<>();
+        
 		ClassPath classPath = ClassPath.from(classLoader);
-
+        
 		ImmutableSet<ClassInfo> classes = packageName == null ? classPath.getAllClasses()
 			: classPath.getTopLevelClassesRecursive(packageName);
 		for (ClassInfo classInfo : classes)
 		{
 			Class<?> clazz = classInfo.load();
-			PluginDescriptor pluginDescriptor = clazz.getAnnotation(PluginDescriptor.class);
-
-			if (pluginDescriptor == null)
-			{
-				if (clazz.getSuperclass() == Plugin.class)
-				{
-					log.warn("Class {} is a plugin, but has no plugin descriptor",
-							clazz);
-				}
-				continue;
-			}
-
-			if (clazz.getSuperclass() != Plugin.class)
-			{
-				log.warn("Class {} has plugin descriptor, but is not a plugin",
-						clazz);
-				continue;
-			}
-
-			if (!pluginDescriptor.loadWhenOutdated() && isOutdated)
-			{
-				continue;
-			}
-
-			if (pluginDescriptor.developerPlugin() && !developerMode)
-			{
-				continue;
-			}
-
-			Class<Plugin> pluginClass = (Class<Plugin>) clazz;
-			graph.addNode(pluginClass);
+            if (isPluginClass(clazz)) {
+                scannedPlugins.add((Class<Plugin>) clazz);
+            }
 		}
+        
+        return scannedPlugins;
+    }
+    
+    boolean isPluginClass(Class<?> classToCheck)
+    {
+        PluginDescriptor pluginDescriptor = classToCheck.getAnnotation(PluginDescriptor.class);
 
-		// Build plugin graph
+        if (pluginDescriptor == null)
+        {
+            if (classToCheck.getSuperclass() == Plugin.class)
+            {
+                log.warn("Class {} is a plugin, but has no plugin descriptor",
+                        classToCheck);
+            }
+            return false;
+        }
+
+        if (classToCheck.getSuperclass() != Plugin.class)
+        {
+            log.warn("Class {} has plugin descriptor, but is not a plugin",
+                    classToCheck);
+            return false;
+        }
+
+        if (!pluginDescriptor.loadWhenOutdated() && isOutdated)
+        {
+            return false;
+        }
+
+        if (pluginDescriptor.developerPlugin() && !developerMode)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    List<Plugin> instantiatePlugins(List<Class<? extends Plugin>> scannedPlugins) {
+        
+		MutableGraph<Class<? extends Plugin>> graph = GraphBuilder
+			.directed()
+			.build();
+        
+        List<Plugin> instantiatedPlugins = new ArrayList<>();
+        
+        scannedPlugins.forEach((plugin) ->
+        {
+            graph.addNode(plugin);
+        });
+        
+        // Build plugin graph
 		for (Class<? extends Plugin> pluginClazz : graph.nodes())
 		{
 			PluginDependency[] pluginDependencies = pluginClazz.getAnnotationsByType(PluginDependency.class);
@@ -301,7 +314,7 @@ public class PluginManager
 			Plugin plugin;
 			try
 			{
-				plugin = instantiate(scannedPlugins, (Class<Plugin>) pluginClazz);
+				plugin = instantiate(instantiatedPlugins, (Class<Plugin>) pluginClazz);
 			}
 			catch (PluginInstantiationException ex)
 			{
@@ -309,31 +322,75 @@ public class PluginManager
 				continue;
 			}
 
-			scannedPlugins.add(plugin);
+			instantiatedPlugins.add(plugin);
 		}
-
-		return scannedPlugins;
-	}
+        
+        return instantiatedPlugins;
+    }
     
-    List<Plugin> loadExternalFolder(File pluginFolder) throws InvalidPluginException {
+    List<Class<? extends Plugin>> scanExternalFolder(ClassLoader parentClassLoader, File pluginFolder) throws IOException {
         if (!pluginFolder.exists()) {
             pluginFolder.mkdirs();
         }
         
-        ArrayList<Plugin> loadedPlugins = new ArrayList<>();
-        PluginLoader loader = new PluginLoader();
+        ArrayList<Class<? extends Plugin>> scannedPlugins = new ArrayList<>();
         
+        // Scan the external folder for plugins
         for (File pluginFile : pluginFolder.listFiles())
         {
+            // Check if the file is a jar file
             if (!pluginFile.getName().endsWith(".jar"))
             {
                 continue;
             }
             
-            loadedPlugins.add(loader.loadPlugin(pluginFile));
+            try
+            {
+                PluginClassLoader loader = new PluginClassLoader(this, parentClassLoader, pluginFile);
+                loaders.put(pluginFile.getName(), loader);
+                scannedPlugins.addAll(loader.getPluginClasses());
+            } catch (MalformedURLException | InvalidPluginException ex)
+            {
+                log.error("Failed to load plugin file `" + pluginFile.getName() + "`", ex);
+            }
         }
         
-        return loadedPlugins;
+        return scannedPlugins;
+    }
+    
+    
+    void setClass(final String name, final Class<?> clazz) 
+    {
+        if (!classes.containsKey(name))
+        {
+            classes.put(name, clazz);
+        }
+    }
+
+    Class<?> getClassByName(final String name)
+    {
+        Class<?> cachedClass = classes.get(name);
+
+        if (cachedClass != null)
+        {
+            return cachedClass;
+        } else
+        {
+            for (String current : loaders.keySet())
+            {
+                PluginClassLoader loader = loaders.get(current);
+                try
+                {
+                    cachedClass = loader.findClass(name, false);
+                } catch (ClassNotFoundException cnfe) {}
+                
+                if (cachedClass != null)
+                {
+                    return cachedClass;
+                }
+            }
+        }
+        return null;
     }
 
 	public synchronized boolean startPlugin(Plugin plugin) throws PluginInstantiationException
