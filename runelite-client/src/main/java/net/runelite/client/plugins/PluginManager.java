@@ -40,10 +40,16 @@ import com.google.inject.CreationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +57,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -170,6 +178,7 @@ public class PluginManager
 		List<Config> list = new ArrayList<>();
 		for (Injector injector : injectors)
 		{
+            System.out.println(injector);
 			for (Key<?> key : injector.getAllBindings().keySet())
 			{
 				Class<?> type = key.getTypeLiteral().getRawType();
@@ -195,6 +204,13 @@ public class PluginManager
 	public void loadCorePlugins() throws IOException
 	{
 		plugins.addAll(scanAndInstantiate(getClass().getClassLoader(), PLUGIN_PACKAGE));
+        try
+        {
+            plugins.addAll(loadExternalFolder(new File("plugins").getAbsoluteFile()));
+        } catch (InvalidPluginException ex)
+        {
+            Logger.getLogger(PluginManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
 	}
 
 	public void startCorePlugins()
@@ -298,6 +314,27 @@ public class PluginManager
 
 		return scannedPlugins;
 	}
+    
+    List<Plugin> loadExternalFolder(File pluginFolder) throws InvalidPluginException {
+        if (!pluginFolder.exists()) {
+            pluginFolder.mkdirs();
+        }
+        
+        ArrayList<Plugin> loadedPlugins = new ArrayList<>();
+        PluginLoader loader = new PluginLoader();
+        
+        for (File pluginFile : pluginFolder.listFiles())
+        {
+            if (!pluginFile.getName().endsWith(".jar"))
+            {
+                continue;
+            }
+            
+            loadedPlugins.add(loader.loadPlugin(pluginFile));
+        }
+        
+        return loadedPlugins;
+    }
 
 	public synchronized boolean startPlugin(Plugin plugin) throws PluginInstantiationException
 	{

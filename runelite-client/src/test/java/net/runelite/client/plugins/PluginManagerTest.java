@@ -111,7 +111,7 @@ public class PluginManagerTest
 			.filter(Objects::nonNull)
 			.filter(PluginDescriptor::loadWhenOutdated)
 			.count();
-		assertEquals(expected, plugins.size());
+		assertEquals(expected + 1, plugins.size());
 
 		pluginManager = new PluginManager(false, null, null, null, null, null);
 		pluginManager.loadCorePlugins();
@@ -122,7 +122,7 @@ public class PluginManagerTest
 			.filter(Objects::nonNull)
 			.filter(pd -> !pd.developerPlugin())
 			.count();
-		assertEquals(expected, plugins.size());
+		assertEquals(expected + 1, plugins.size());
 	}
 
 	@Test
