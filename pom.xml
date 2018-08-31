@@ -126,6 +126,7 @@
 		<module>http-service</module>
 		<module>protocol-api</module>
 		<module>protocol</module>
+        <module>runelite-plugins</module>
 	</modules>
 
 	<dependencyManagement>

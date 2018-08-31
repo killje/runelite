@@ -179,7 +179,6 @@ public class PluginManager
 		List<Config> list = new ArrayList<>();
 		for (Injector injector : injectors)
 		{
-            System.out.println(injector);
 			for (Key<?> key : injector.getAllBindings().keySet())
 			{
 				Class<?> type = key.getTypeLiteral().getRawType();
