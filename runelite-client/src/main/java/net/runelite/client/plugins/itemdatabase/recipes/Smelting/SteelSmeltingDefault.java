@@ -23,10 +23,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase.recipes;
+package net.runelite.client.plugins.itemdatabase.recipes.Smelting;
 
-public enum RecipeID
+import java.util.Arrays;
+import net.runelite.api.ItemID;
+import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeID;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
+
+public class SteelSmeltingDefault extends Recipe
 {
-	IRON_SMELTING_DEFAULT,
-	STEEL_SMELTING_DEFAULT
+	public SteelSmeltingDefault()
+	{
+		super(
+			RecipeID.STEEL_SMELTING_DEFAULT,
+			Arrays.asList(new RecipeItem(ItemID.IRON_ORE, 1), new RecipeItem(ItemID.COAL, 2)),
+			Arrays.asList(new RecipeItem(ItemID.STEEL_BAR, 1))
+		);
+
+	}
 }

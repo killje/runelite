@@ -25,32 +25,31 @@
  */
 package net.runelite.client.plugins.itemdatabase.recipes;
 
-import javax.inject.Inject;
 import net.runelite.api.ItemComposition;
+import net.runelite.client.RuneLite;
 import net.runelite.client.game.ItemManager;
+
 
 public class RecipeItem
 {
-	@Inject
-	private ItemManager itemManager;
-
-	private ItemComposition itemComposition;
+	private int itemId;
 	private int quantity;
+
 
 	public RecipeItem(int itemId, int quantity)
 	{
-		this.itemComposition = itemManager.getItemComposition(itemId);
+		this.itemId = itemId;
 		this.quantity = quantity;
 	}
 
 	public int getId()
 	{
-		return itemComposition.getId();
+		return itemId;
 	}
 
 	public ItemComposition getItemComposition()
 	{
-		return itemComposition;
+		return  RuneLite.getInjector().getInstance(ItemManager.class).getItemComposition(itemId);
 	}
 
 	public int getQuantity()
