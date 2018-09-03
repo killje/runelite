@@ -28,6 +28,7 @@ package net.runelite.client.plugins.itemdatabase;
 import com.google.common.eventbus.Subscribe;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -35,7 +36,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.api.ItemID;
-import net.runelite.client.game.AsyncBufferedImage;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -48,12 +48,13 @@ import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(
-	name = "Item Database",
-	description = "Search for items and get all the information about these items.",
-	tags = {"item", "recipe", "info"},
-	enabledByDefault = false
+		name = "Item Database",
+		description = "Search for items and get all the information about these items.",
+		tags = {"item", "recipe", "info"},
+		enabledByDefault = false
 )
 @Slf4j
 public class ItemDatabasePlugin extends Plugin
@@ -67,37 +68,33 @@ public class ItemDatabasePlugin extends Plugin
 	@Inject
 	private RecipeManager recipeManager;
 
-
 	@Inject
 	private ClientThread clientThread;
 
 	@Inject
 	private Client client;
 
-	
 	@Inject
 	private ClientToolbar clientToolbar;
+
+	private final ItemDatabasePanel itemDatabasePanel = new ItemDatabasePanel();
 	
-	@Inject
-	private ItemManager itemManager;
+	private NavigationButton navButton;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		
-		ItemDatabasePanel panel = new ItemDatabasePanel();
-		
-		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
-		
-		NavigationButton navButton = NavigationButton.builder()
-			.tooltip("Item Database")
-			.icon(icon)
-			.panel(panel)
-			.priority(4)
-			.build();		
-			
-		clientToolbar.addNavigation(navButton);
+		BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "ItemDbIcon.png");
 
+		navButton = NavigationButton.builder()
+				.tooltip("Item Database")
+				.icon(icon)
+				.panel(itemDatabasePanel)
+				.priority(4)
+				.build();
+
+		clientToolbar.addNavigation(navButton);
+		
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			initRecipesManager();
@@ -109,7 +106,7 @@ public class ItemDatabasePlugin extends Plugin
 	protected void shutDown()
 	{
 		log.info("Shutting down.");
-		
+		clientToolbar.removeNavigation(navButton);
 	}
 
 	@Subscribe
