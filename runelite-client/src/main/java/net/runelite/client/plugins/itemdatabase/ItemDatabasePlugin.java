@@ -66,6 +66,17 @@ public class ItemDatabasePlugin extends Plugin
 	private ItemDatabasePanel itemDatabasePanel;
 
 	@Inject
+	private RecipeManager recipeManager;
+
+
+	@Inject
+	private ClientThread clientThread;
+
+	@Inject
+	private Client client;
+
+
+	@Inject
 	private ClientToolbar clientToolbar;
 
 	@Inject
@@ -79,7 +90,7 @@ public class ItemDatabasePlugin extends Plugin
 	private Client client;
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "ItemDbIcon.png");
 
@@ -97,6 +108,12 @@ public class ItemDatabasePlugin extends Plugin
 			initRecipesManager();
 		}
 		
+	}
+
+	@Override
+	protected void shutDown()
+	{
+		log.info("Shutting down.");
 	}
 
 	@Subscribe
