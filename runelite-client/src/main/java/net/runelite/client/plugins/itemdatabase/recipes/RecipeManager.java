@@ -25,7 +25,33 @@
  */
 package net.runelite.client.plugins.itemdatabase.recipes;
 
-public enum RecipeID
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import net.runelite.client.plugins.itemdatabase.ItemDatabasePlugin;
+import org.reflections.Reflections;
+
+@Singleton
+public class RecipeManager
 {
-	IRON_SMELTING_DEFAULT
+	@Inject
+	private ItemDatabasePlugin itemDatabasePlugin;
+
+	private List<RecipeGroup> recipeGroups;
+
+	@PostConstruct
+	public void init()
+	{
+		recipeGroups = new ArrayList<>();
+		Reflections reflections = new Reflections("net.runelite.client.plugins.itemdatabase.recipes");
+		Set<Class<? extends RecipeGroup>> recipeGroupClasses = reflections.getSubTypesOf(RecipeGroup.class);
+
+		for (Class<? extends RecipeGroup> recipeGroupClass : recipeGroupClasses)
+		{
+			recipeGroups.add(itemDatabasePlugin.getInjector().getInstance(recipeGroupClass));
+		}
+	}
 }
