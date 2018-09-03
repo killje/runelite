@@ -69,7 +69,6 @@ public class ItemDatabasePlugin extends Plugin
 	@Inject
 	private Client client;
 
-
 	@Inject
 	private ClientToolbar clientToolbar;
 
