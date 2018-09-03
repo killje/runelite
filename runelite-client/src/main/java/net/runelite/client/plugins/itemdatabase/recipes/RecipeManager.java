@@ -25,25 +25,23 @@
  */
 package net.runelite.client.plugins.itemdatabase.recipes;
 
+import com.google.inject.Injector;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.runelite.client.plugins.itemdatabase.ItemDatabasePlugin;
+import net.runelite.client.RuneLite;
 import org.reflections.Reflections;
 
 @Singleton
 public class RecipeManager
 {
-	@Inject
-	private ItemDatabasePlugin itemDatabasePlugin;
-
 	private List<RecipeGroup> recipeGroups;
+	private boolean loaded;
 
-	@PostConstruct
-	public void init()
+	public void loadRecipeGroups()
 	{
 		recipeGroups = new ArrayList<>();
 		Reflections reflections = new Reflections("net.runelite.client.plugins.itemdatabase.recipes");
@@ -51,7 +49,56 @@ public class RecipeManager
 
 		for (Class<? extends RecipeGroup> recipeGroupClass : recipeGroupClasses)
 		{
-			recipeGroups.add(itemDatabasePlugin.getInjector().getInstance(recipeGroupClass));
+			Injector injector = RuneLite.getInjector();
+			RecipeGroup recipeGroup = injector.getInstance(recipeGroupClass);
+			recipeGroups.add(recipeGroup);
 		}
+		this.loaded = true;
+	}
+
+	public List<RecipeGroup> getRecipeGroups()
+	{
+		return recipeGroups;
+	}
+
+	public Map<RecipeGroup, List<Recipe>> getRecipesFromInput(int itemId)
+	{
+		if (!loaded)
+		{
+			return null;
+		}
+		Map<RecipeGroup, List<Recipe>> recipesFromInput = new HashMap<>();
+		for (RecipeGroup recipeGroup : recipeGroups)
+		{
+			List<Recipe> recipes = recipeGroup.getRecipesFromInput(itemId);
+			if (!recipes.isEmpty())
+			{
+				recipesFromInput.put(recipeGroup, recipes);
+			}
+		}
+		return recipesFromInput;
+	}
+
+	public Map<RecipeGroup, List<Recipe>> getRecipesFromOutput(int itemId)
+	{
+		if (!loaded)
+		{
+			return null;
+		}
+		Map<RecipeGroup, List<Recipe>> recipesFromOutput = new HashMap<>();
+		for (RecipeGroup recipeGroup : recipeGroups)
+		{
+			List<Recipe> recipes = recipeGroup.getRecipesFromOutput(itemId);
+			if (!recipes.isEmpty())
+			{
+				recipesFromOutput.put(recipeGroup, recipes);
+			}
+		}
+		return recipesFromOutput;
+	}
+
+	public boolean isLoaded()
+	{
+		return loaded;
 	}
 }

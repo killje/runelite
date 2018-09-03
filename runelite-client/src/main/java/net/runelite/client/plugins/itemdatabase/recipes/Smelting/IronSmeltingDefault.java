@@ -27,11 +27,13 @@ package net.runelite.client.plugins.itemdatabase.recipes.Smelting;
 
 import java.util.Arrays;
 import net.runelite.api.ItemID;
+import net.runelite.client.plugins.itemdatabase.properties.Chance;
 import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeID;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
+import org.apache.commons.lang3.math.Fraction;
 
-public class IronSmeltingDefault extends Recipe
+public class IronSmeltingDefault extends Recipe implements Chance
 {
 	public IronSmeltingDefault()
 	{
@@ -40,5 +42,11 @@ public class IronSmeltingDefault extends Recipe
 			Arrays.asList(new RecipeItem(ItemID.IRON_ORE, 1)),
 			Arrays.asList(new RecipeItem(ItemID.IRON_BAR, 1))
 		);
+	}
+
+	@Override
+	public Fraction getChanceFraction()
+	{
+		return Fraction.ONE_HALF;
 	}
 }
