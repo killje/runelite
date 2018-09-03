@@ -149,6 +149,11 @@
 			<version>${guice.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.cc007</groupId>
+			<artifactId>OBCNMSReflectionDemo</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

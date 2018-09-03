@@ -67,7 +67,7 @@ public class ItemDatabasePlugin extends Plugin
 
 	@Inject
 	private ClientToolbar clientToolbar;
-	
+
 	@Inject
 	private RecipeManager recipeManager;
 
