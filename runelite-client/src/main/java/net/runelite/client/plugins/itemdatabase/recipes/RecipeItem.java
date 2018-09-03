@@ -25,7 +25,36 @@
  */
 package net.runelite.client.plugins.itemdatabase.recipes;
 
-public enum RecipeID
+import javax.inject.Inject;
+import net.runelite.api.ItemComposition;
+import net.runelite.client.game.ItemManager;
+
+public class RecipeItem
 {
-	IRON_SMELTING_DEFAULT
+	@Inject
+	private ItemManager itemManager;
+
+	private ItemComposition itemComposition;
+	private int quantity;
+
+	public RecipeItem(int itemId, int quantity)
+	{
+		this.itemComposition = itemManager.getItemComposition(itemId);
+		this.quantity = quantity;
+	}
+
+	public int getId()
+	{
+		return itemComposition.getId();
+	}
+
+	public ItemComposition getItemComposition()
+	{
+		return itemComposition;
+	}
+
+	public int getQuantity()
+	{
+		return quantity;
+	}
 }
