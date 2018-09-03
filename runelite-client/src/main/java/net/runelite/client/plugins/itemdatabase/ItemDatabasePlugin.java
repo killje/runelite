@@ -185,6 +185,4 @@ public class ItemDatabasePlugin extends Plugin
 		}, 1, TimeUnit.SECONDS);
 	}
 
-
-
 }
