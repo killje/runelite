@@ -23,10 +23,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase.recipes;
+package net.runelite.client.plugins.itemdatabase.properties;
 
-public enum RecipeID
+import java.math.BigDecimal;
+import org.apache.commons.lang3.math.Fraction;
+
+public interface Chance
 {
-	IRON_SMELTING_DEFAULT,
-	STEEL_SMELTING_DEFAULT
+	public Fraction getChanceFraction();
+
+	default public BigDecimal getChancePercentage(int precision)
+	{
+		return new BigDecimal(getChanceFraction()
+			.multiplyBy(Fraction.getFraction("100"))
+			.multiplyBy(Fraction.getFraction(Math.pow(10, precision)))
+			.longValue())
+			.divide(new BigDecimal(Math.pow(10, precision)));
+	}
 }

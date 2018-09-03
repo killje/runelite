@@ -32,5 +32,6 @@ public class SmeltingGroup extends RecipeGroup
 	public SmeltingGroup()
 	{
 		addRecipe(new IronSmeltingDefault());
+		addRecipe(new SteelSmeltingDefault());
 	}
 }
