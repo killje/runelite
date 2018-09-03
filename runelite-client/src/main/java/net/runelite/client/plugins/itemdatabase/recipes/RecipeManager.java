@@ -23,50 +23,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase;
+package net.runelite.client.plugins.itemdatabase.recipes;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import net.runelite.api.ItemID;
-import net.runelite.client.game.AsyncBufferedImage;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.ClientToolbar;
-import net.runelite.client.ui.NavigationButton;
+import javax.inject.Singleton;
+import net.runelite.client.plugins.itemdatabase.ItemDatabasePlugin;
+import org.reflections.Reflections;
 
-@PluginDescriptor(
-	name = "Item Database",
-	description = "Search for items and get all the information about these items.",
-	tags = {"item", "recipe", "info"},
-	enabledByDefault = false
-)
-@Slf4j
-public class ItemDatabasePlugin extends Plugin
+@Singleton
+public class RecipeManager
 {
-	
 	@Inject
-	private ClientToolbar clientToolbar;
-	
-	@Inject
-	private ItemManager itemManager;
+	private ItemDatabasePlugin itemDatabasePlugin;
 
-	@Override
-	protected void startUp() throws Exception
+	private List<RecipeGroup> recipeGroups;
+
+	@PostConstruct
+	public void init()
 	{
-		
-		ItemDatabasePanel panel = new ItemDatabasePanel();
-		
-		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
-		
-		NavigationButton navButton = NavigationButton.builder()
-			.tooltip("Item Database")
-			.icon(icon)
-			.panel(panel)
-			.priority(4)
-			.build();
+		recipeGroups = new ArrayList<>();
+		Reflections reflections = new Reflections("net.runelite.client.plugins.itemdatabase.recipes");
+		Set<Class<? extends RecipeGroup>> recipeGroupClasses = reflections.getSubTypesOf(RecipeGroup.class);
 
-		clientToolbar.addNavigation(navButton);
+		for (Class<? extends RecipeGroup> recipeGroupClass : recipeGroupClasses)
+		{
+			recipeGroups.add(itemDatabasePlugin.getInjector().getInstance(recipeGroupClass));
+		}
 	}
-	
-	
 }

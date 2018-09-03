@@ -23,50 +23,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase;
+package net.runelite.client.plugins.itemdatabase.recipes;
 
 import javax.inject.Inject;
-import net.runelite.api.ItemID;
-import net.runelite.client.game.AsyncBufferedImage;
+import net.runelite.api.ItemComposition;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.ClientToolbar;
-import net.runelite.client.ui.NavigationButton;
 
-@PluginDescriptor(
-	name = "Item Database",
-	description = "Search for items and get all the information about these items.",
-	tags = {"item", "recipe", "info"},
-	enabledByDefault = false
-)
-@Slf4j
-public class ItemDatabasePlugin extends Plugin
+public class RecipeItem
 {
-	
-	@Inject
-	private ClientToolbar clientToolbar;
-	
 	@Inject
 	private ItemManager itemManager;
 
-	@Override
-	protected void startUp() throws Exception
-	{
-		
-		ItemDatabasePanel panel = new ItemDatabasePanel();
-		
-		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
-		
-		NavigationButton navButton = NavigationButton.builder()
-			.tooltip("Item Database")
-			.icon(icon)
-			.panel(panel)
-			.priority(4)
-			.build();
+	private ItemComposition itemComposition;
+	private int quantity;
 
-		clientToolbar.addNavigation(navButton);
+	public RecipeItem(int itemId, int quantity)
+	{
+		this.itemComposition = itemManager.getItemComposition(itemId);
+		this.quantity = quantity;
 	}
-	
-	
+
+	public int getId()
+	{
+		return itemComposition.getId();
+	}
+
+	public ItemComposition getItemComposition()
+	{
+		return itemComposition;
+	}
+
+	public int getQuantity()
+	{
+		return quantity;
+	}
 }

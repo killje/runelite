@@ -30,9 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import net.runelite.api.Item;
 
-public class RecipeGroup
+public abstract class RecipeGroup
 {
 	private Map<RecipeID, Recipe> recipes;
 	private Map<Integer, List<RecipeID>> recipesWithInputs;
@@ -53,13 +52,13 @@ public class RecipeGroup
 		}
 		recipes.put(recipe.getId(), recipe);
 
-		for (Item item : recipe.getInputs())
+		for (RecipeItem item : recipe.getInputs())
 		{
 			List<RecipeID> recipesWithInput = recipesWithInputs.computeIfAbsent(item.getId(), k -> new ArrayList<>());
 			recipesWithInput.add(recipe.getId());
 		}
 
-		for (Item item : recipe.getOutputs())
+		for (RecipeItem item : recipe.getOutputs())
 		{
 			List<RecipeID> recipesWithOutput = recipesWithOutputs.computeIfAbsent(item.getId(), k -> new ArrayList<>());
 			recipesWithOutput.add(recipe.getId());
@@ -67,28 +66,35 @@ public class RecipeGroup
 		return true;
 	}
 
-	protected removeRecipe(Recipe recipe)
+	protected boolean removeRecipe(Recipe recipe)
 	{
-		for (Item item : recipe.getOutputs())
+		if (recipes.get(recipe.getId()) == null)
 		{
-			recipesWithOutputs.get(item.getId()).remove(recipe.getId());
+			return false;
 		}
 
-		for (Item item : recipe.getInputs())
+		recipes.remove(recipe.getId());
+
+		for (RecipeItem item : recipe.getInputs())
 		{
 			recipesWithInputs.get(item.getId()).remove(recipe.getId());
 		}
 
-		recipes.remove(recipe.getId());
+		for (RecipeItem item : recipe.getOutputs())
+		{
+			recipesWithOutputs.get(item.getId()).remove(recipe.getId());
+		}
+
+		return true;
 	}
 
-	public List<Recipe> getRecipesFromInput(int itemID)
+	public List<Recipe> getRecipesFromInput(int itemId)
 	{
-		return recipesWithInputs.get(itemID).stream().map((RecipeID id) -> recipes.get(id)).collect(Collectors.toList());
+		return recipesWithInputs.get(itemId).stream().map((RecipeID id) -> recipes.get(id)).collect(Collectors.toList());
 	}
 
-	public List<Recipe> getRecipesFromOutput(int itemID)
+	public List<Recipe> getRecipesFromOutput(int itemId)
 	{
-		return recipesWithOutputs.get(itemID).stream().map((RecipeID id) -> recipes.get(id)).collect(Collectors.toList());
+		return recipesWithOutputs.get(itemId).stream().map((RecipeID id) -> recipes.get(id)).collect(Collectors.toList());
 	}
 }

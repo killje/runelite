@@ -23,50 +23,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase;
+package net.runelite.client.plugins.itemdatabase.recipes.Smelting;
 
-import javax.inject.Inject;
+import java.util.Arrays;
 import net.runelite.api.ItemID;
-import net.runelite.client.game.AsyncBufferedImage;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.ClientToolbar;
-import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeID;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 
-@PluginDescriptor(
-	name = "Item Database",
-	description = "Search for items and get all the information about these items.",
-	tags = {"item", "recipe", "info"},
-	enabledByDefault = false
-)
-@Slf4j
-public class ItemDatabasePlugin extends Plugin
+public class IronSmeltingDefault extends Recipe
 {
-	
-	@Inject
-	private ClientToolbar clientToolbar;
-	
-	@Inject
-	private ItemManager itemManager;
-
-	@Override
-	protected void startUp() throws Exception
+	public IronSmeltingDefault()
 	{
-		
-		ItemDatabasePanel panel = new ItemDatabasePanel();
-		
-		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
-		
-		NavigationButton navButton = NavigationButton.builder()
-			.tooltip("Item Database")
-			.icon(icon)
-			.panel(panel)
-			.priority(4)
-			.build();
-
-		clientToolbar.addNavigation(navButton);
+		super(
+			RecipeID.IRON_SMELTING_DEFAULT,
+			Arrays.asList(new RecipeItem(ItemID.IRON_ORE, 1)),
+			Arrays.asList(new RecipeItem(ItemID.IRON_BAR, 1))
+		);
 	}
-	
-	
 }
