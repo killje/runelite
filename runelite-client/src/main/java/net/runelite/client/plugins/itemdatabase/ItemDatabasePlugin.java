@@ -82,6 +82,8 @@ public class ItemDatabasePlugin extends Plugin
 	
 	private NavigationButton navButton;
 
+	private NavigationButton navButton;
+
 	@Override
 	protected void startUp()
 	{
@@ -104,7 +106,7 @@ public class ItemDatabasePlugin extends Plugin
 
 
 	@Override
-	protected void shutDown()
+	protected void shutDown() throws Exception
 	{
 		log.info("Shutting down.");
 		clientToolbar.removeNavigation(navButton);
@@ -181,5 +183,7 @@ public class ItemDatabasePlugin extends Plugin
 			}
 		}, 1, TimeUnit.SECONDS);
 	}
+
+
 
 }
