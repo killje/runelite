@@ -25,6 +25,7 @@
  */
 package net.runelite.client.plugins.itemdatabase;
 
+import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import net.runelite.api.ItemID;
 import net.runelite.client.game.AsyncBufferedImage;
@@ -40,6 +41,7 @@ import net.runelite.client.ui.NavigationButton;
 	tags = {"item", "recipe", "info"},
 	enabledByDefault = false
 )
+@Slf4j
 public class ItemDatabasePlugin extends Plugin
 {
 	
