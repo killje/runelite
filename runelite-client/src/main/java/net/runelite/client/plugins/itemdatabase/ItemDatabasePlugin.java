@@ -43,6 +43,9 @@ import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeGroup;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(
 		name = "Item Database",
@@ -58,7 +61,13 @@ public class ItemDatabasePlugin extends Plugin
 
 	@Inject
 	private ScheduledExecutorService executorService;
+	
+	@Inject
+	private ItemDatabasePanel itemDatabasePanel;
 
+	@Inject
+	private ClientToolbar clientToolbar;
+	
 	@Inject
 	private RecipeManager recipeManager;
 
@@ -70,19 +79,24 @@ public class ItemDatabasePlugin extends Plugin
 	private Client client;
 
 	@Override
-	protected void startUp()
+	protected void startUp() throws Exception
 	{
+		BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "ItemDbIcon.png");
+
+		navButton = NavigationButton.builder()
+				.tooltip("Item Database")
+				.icon(icon)
+				.panel(itemDatabasePanel)
+				.priority(4)
+				.build();
+
+		clientToolbar.addNavigation(navButton);
 
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			initRecipesManager();
 		}
-	}
-
-	@Override
-	protected void startUp() throws Exception
-	{
-		log.info("Shutting down.");
+		
 	}
 
 	@Subscribe
