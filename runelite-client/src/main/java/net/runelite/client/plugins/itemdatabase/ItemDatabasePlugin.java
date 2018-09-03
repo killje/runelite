@@ -44,6 +44,7 @@ import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeGroup;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
+import net.runelite.client.plugins.itemdatabase.layout.ItemDatabasePanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -74,6 +75,9 @@ public class ItemDatabasePlugin extends Plugin
 	private Client client;
 
 	@Inject
+	private ItemDatabasePanel itemDatabasePanel;
+
+	@Inject
 	private ClientToolbar clientToolbar;
 
 	@Inject
@@ -86,6 +90,7 @@ public class ItemDatabasePlugin extends Plugin
 	{
 
 		ItemDatabasePanel panel = new ItemDatabasePanel();
+		BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "ItemDbIcon.png");
 
 		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
 
