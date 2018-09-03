@@ -150,9 +150,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.cc007</groupId>
-			<artifactId>OBCNMSReflectionDemo</artifactId>
-			<version>0.0.1</version>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.11</version>
 		</dependency>
 	</dependencies>
 
