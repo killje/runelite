@@ -26,25 +26,31 @@
 package net.runelite.client.plugins.itemdatabase.recipes;
 
 import java.util.List;
-import net.runelite.api.Item;
 
-public class Recipe
+public abstract class Recipe
 {
-	private RecipeID id;
-	private List<Item> inputs;
-	private List<Item> outputs;
+	protected final RecipeID id;
+	protected final List<RecipeItem> inputs;
+	protected final List<RecipeItem> outputs;
+
+	public Recipe(RecipeID id, List<RecipeItem> inputs, List<RecipeItem> outputs)
+	{
+		this.id = id;
+		this.inputs = inputs;
+		this.outputs = outputs;
+	}
 
 	public RecipeID getId()
 	{
 		return id;
 	}
 
-	public List<Item> getInputs()
+	public List<RecipeItem> getInputs()
 	{
 		return inputs;
 	}
 
-	public List<Item> getOutputs()
+	public List<RecipeItem> getOutputs()
 	{
 		return outputs;
 	}

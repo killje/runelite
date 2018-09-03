@@ -27,4 +27,5 @@ package net.runelite.client.plugins.itemdatabase.recipes;
 
 public enum RecipeID
 {
+	IRON_SMELTING_DEFAULT
 }
