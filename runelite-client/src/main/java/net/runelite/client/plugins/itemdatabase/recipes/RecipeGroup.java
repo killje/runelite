@@ -88,6 +88,11 @@ public abstract class RecipeGroup
 		return true;
 	}
 
+	public List<Recipe> getRecipes()
+	{
+		return new ArrayList<>(recipes.values());
+	}
+
 	public List<Recipe> getRecipesFromInput(int itemId)
 	{
 		return recipesWithInputs.get(itemId).stream().map((RecipeID id) -> recipes.get(id)).collect(Collectors.toList());
