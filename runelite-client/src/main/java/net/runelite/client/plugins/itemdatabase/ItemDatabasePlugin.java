@@ -26,25 +26,26 @@
 package net.runelite.client.plugins.itemdatabase;
 
 import com.google.common.eventbus.Subscribe;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
+import net.runelite.client.plugins.itemdatabase.layout.ItemDatabasePanel;
 import net.runelite.client.plugins.itemdatabase.properties.Chance;
 import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeGroup;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
-import net.runelite.client.plugins.itemdatabase.layout.ItemDatabasePanel;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -89,15 +90,12 @@ public class ItemDatabasePlugin extends Plugin
 	protected void startUp()
 	{
 
-		ItemDatabasePanel panel = new ItemDatabasePanel();
 		BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "ItemDbIcon.png");
 
-		AsyncBufferedImage icon = itemManager.getImage(ItemID.CLOCKWORK_BOOK);
-
-		NavigationButton navButton = NavigationButton.builder()
+		navButton = NavigationButton.builder()
 			.tooltip("Item Database")
 			.icon(icon)
-			.panel(panel)
+			.panel(itemDatabasePanel)
 			.priority(4)
 			.build();
 
