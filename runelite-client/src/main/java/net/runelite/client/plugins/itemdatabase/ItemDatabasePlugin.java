@@ -28,6 +28,7 @@ package net.runelite.client.plugins.itemdatabase;
 import com.google.common.eventbus.Subscribe;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -88,6 +89,8 @@ public class ItemDatabasePlugin extends Plugin
 	@Inject
 	private Client client;
 
+	private NavigationButton navButton;
+
 	@Override
 	protected void startUp()
 	{
@@ -110,9 +113,9 @@ public class ItemDatabasePlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown()
+	protected void shutDown() throws Exception
 	{
-		log.info("Shutting down.");
+		clientToolbar.removeNavigation(navButton);
 	}
 
 	@Subscribe
@@ -186,5 +189,7 @@ public class ItemDatabasePlugin extends Plugin
 			}
 		}, 1, TimeUnit.SECONDS);
 	}
+
+
 
 }
