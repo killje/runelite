@@ -45,10 +45,10 @@ import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
 
 @PluginDescriptor(
-	name = "Item Database",
-	description = "Search for items and get all the information about these items.",
-	tags = {"item", "recipe", "info"},
-	enabledByDefault = false
+		name = "Item Database",
+		description = "Search for items and get all the information about these items.",
+		tags = {"item", "recipe", "info"},
+		enabledByDefault = false
 )
 @Slf4j
 public class ItemDatabasePlugin extends Plugin
