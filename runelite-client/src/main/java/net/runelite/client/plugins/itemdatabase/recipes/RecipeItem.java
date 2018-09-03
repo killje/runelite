@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018 Patrick Beuks (killje) <patrick.beuks@gmail.com>
+ * Copyright (c) 2018 CC007 <Coolcat_the_best2@hotmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,15 +23,37 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.fishing;
+package net.runelite.client.plugins.itemdatabase.recipes;
 
-import java.time.Instant;
-import lombok.Getter;
-import lombok.Setter;
+import net.runelite.api.ItemComposition;
+import net.runelite.client.RuneLite;
+import net.runelite.client.game.ItemManager;
 
-class FishingSession
+
+public class RecipeItem
 {
-	@Getter
-	@Setter
-	private Instant lastFishCaught;
+	private int itemId;
+	private int quantity;
+
+
+	public RecipeItem(int itemId, int quantity)
+	{
+		this.itemId = itemId;
+		this.quantity = quantity;
+	}
+
+	public int getId()
+	{
+		return itemId;
+	}
+
+	public ItemComposition getItemComposition()
+	{
+		return  RuneLite.getInjector().getInstance(ItemManager.class).getItemComposition(itemId);
+	}
+
+	public int getQuantity()
+	{
+		return quantity;
+	}
 }

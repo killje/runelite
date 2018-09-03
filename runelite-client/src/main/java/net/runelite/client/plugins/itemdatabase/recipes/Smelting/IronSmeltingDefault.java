@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018 Patrick Beuks (killje) <patrick.beuks@gmail.com>
+ * Copyright (c) 2018 CC007 <Coolcat_the_best2@hotmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,15 +23,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.fishing;
+package net.runelite.client.plugins.itemdatabase.recipes.Smelting;
 
-import java.time.Instant;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Arrays;
+import net.runelite.api.ItemID;
+import net.runelite.client.plugins.itemdatabase.properties.Chance;
+import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeID;
+import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
+import org.apache.commons.lang3.math.Fraction;
 
-class FishingSession
+public class IronSmeltingDefault extends Recipe implements Chance
 {
-	@Getter
-	@Setter
-	private Instant lastFishCaught;
+	public IronSmeltingDefault()
+	{
+		super(
+			RecipeID.IRON_SMELTING_DEFAULT,
+			Arrays.asList(new RecipeItem(ItemID.IRON_ORE, 1)),
+			Arrays.asList(new RecipeItem(ItemID.IRON_BAR, 1))
+		);
+	}
+
+	@Override
+	public Fraction getChanceFraction()
+	{
+		return Fraction.ONE_HALF;
+	}
 }
