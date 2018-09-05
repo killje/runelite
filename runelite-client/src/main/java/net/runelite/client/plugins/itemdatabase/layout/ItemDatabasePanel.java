@@ -46,16 +46,16 @@ public class ItemDatabasePanel extends PluginPanel
 		= new Dimension(PluginPanel.PANEL_WIDTH + SCROLLBAR_WIDTH, 0);
 
 	@Inject
-	public ItemDatabasePanel(SearchBar searchBar, DisplayPanelWrapper displayPanelWrapper)
+	public ItemDatabasePanel(SearchBar searchBar, ContentPanelWrapper contentPanelWrapper)
 	{
 		super(false);
 		setBorder(BORDER_PADDING);
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setPreferredSize(OUTER_PREFERRED_SIZE);
-		setLayout(new BorderLayout(0, OFFSET * 2));
+		setLayout(new BorderLayout(0, OFFSET));
 
 		add(searchBar, BorderLayout.NORTH);
-		add(displayPanelWrapper, BorderLayout.CENTER);
+		add(contentPanelWrapper, BorderLayout.CENTER);
 
 	}
 
