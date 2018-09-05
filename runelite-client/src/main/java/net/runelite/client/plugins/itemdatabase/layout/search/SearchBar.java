@@ -28,13 +28,19 @@ package net.runelite.client.plugins.itemdatabase.layout.search;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.itemdatabase.layout.ContentPanelWrapper;
+import net.runelite.client.plugins.itemdatabase.util.ArrayListModel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.item.Item;
+import net.runelite.http.api.item.SearchResult;
 
 @Singleton
 public class SearchBar extends IconTextField implements ActionListener
@@ -44,8 +50,14 @@ public class SearchBar extends IconTextField implements ActionListener
 	private static final ImageIcon LOADING_ICON;
 	private static final ImageIcon ERROR_ICON;
 
-	private final SearchResultPanel searchResultPanel;
+	@Inject
+	private ContentPanelWrapper contentPanelWrapper;
 
+	@Inject
+	private ItemManager itemManager;
+	
+	private final ArrayListModel<Item> searchResults;
+	
 	static
 	{
 		SEARCH_ICON = new ImageIcon(ImageUtil.alphaOffset(ImageUtil.grayscaleOffset(ImageUtil.getResourceStreamFromClass(IconTextField.class, "search.png"), 0f), 1.75f));
@@ -56,7 +68,7 @@ public class SearchBar extends IconTextField implements ActionListener
 	@Inject
 	public SearchBar(SearchResultPanel searchResultPanel)
 	{
-		this.searchResultPanel = searchResultPanel;
+		searchResults = searchResultPanel.getArrayListModel();
 		initialize();
 	}
 
@@ -66,26 +78,31 @@ public class SearchBar extends IconTextField implements ActionListener
 		setBackground(ColorScheme.MEDIUM_GRAY_COLOR);
 		setHoverBackgroundColor(ColorScheme.MEDIUM_GRAY_COLOR.brighter());
 		setIcon(SEARCH_ICON);
-		addActionListener(this);
-		repaint();
+		addActionListener(this); 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
+		
 		setIcon(LOADING_ICON);
-		CompletableFuture<Integer> search = searchResultPanel.search("test");
-		search.whenComplete((result, action) ->
+		
+		contentPanelWrapper.showPanel("SEARCH_RESULTS");
+		
+		try
 		{
-			if (action == null)
-			{
-				setIcon(SEARCH_ICON);
-			}
-			else
-			{
-				setIcon(ERROR_ICON);
-			}
-		});
+			SearchResult searchResult = itemManager.searchForItem(getText());
+			List<Item> searchResultItems = searchResult.getItems();
 
+			searchResults.clear();
+			searchResults.addAll(searchResultItems);
+			searchResults.addAll(searchResultItems);
+
+			setIcon(SEARCH_ICON);
+		} catch (ExecutionException ex)
+		{
+			setIcon(ERROR_ICON);
+		}
+		
 	}
 }

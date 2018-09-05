@@ -104,6 +104,7 @@ public class ItemDatabasePlugin extends Plugin
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			initRecipesManager();
+			clientToolbar.addNavigation(navButton);
 		}
 	}
 
@@ -121,6 +122,7 @@ public class ItemDatabasePlugin extends Plugin
 		if (event.getGameState() == GameState.LOGGED_IN)
 		{
 			initRecipesManager();
+			clientToolbar.addNavigation(navButton);
 		}
 	}
 
