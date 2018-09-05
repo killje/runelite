@@ -70,7 +70,6 @@ public abstract class ListPanel<T> extends JScrollPane implements ArrayListChang
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1;
 		constraints.gridx = 0;
-		constraints.insets = new Insets(0,0,6,0);
 		
 		this.itemProvider = itemProvider;
 		init();
