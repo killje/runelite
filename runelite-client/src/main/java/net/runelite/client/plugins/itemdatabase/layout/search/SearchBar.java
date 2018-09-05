@@ -96,7 +96,6 @@ public class SearchBar extends IconTextField implements ActionListener
 
 			searchResults.clear();
 			searchResults.addAll(searchResultItems);
-			searchResults.addAll(searchResultItems);
 
 			setIcon(SEARCH_ICON);
 		} catch (ExecutionException ex)
