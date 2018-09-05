@@ -23,9 +23,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.itemdatabase.layout.search;
+package net.runelite.client.plugins.itemdatabase.layout;
 
-public class SearchResultItem
+import java.awt.CardLayout;
+import java.awt.Component;
+import javax.inject.Singleton;
+import javax.swing.JPanel;
+import net.runelite.client.ui.ColorScheme;
+
+@Singleton
+public class ContentPanelWrapper extends JPanel
 {
+	
+	private final CardLayout cardLayout = new CardLayout();
+	
+	public ContentPanelWrapper()
+	{
+		super();
+		init();
+	}
+	
+	private void init() {
+		setLayout(cardLayout);
+		setBackground(ColorScheme.DARK_GRAY_COLOR);
+	}
+
+	public void addPanel(Component component, String layoutName) {
+		component.setVisible(false);
+		add(component, layoutName);
+	}
+	
+	public void showPanel(String layoutName) {
+		cardLayout.show(this, layoutName);
+	}
 
 }

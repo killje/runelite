@@ -25,19 +25,37 @@
  */
 package net.runelite.client.plugins.itemdatabase.layout;
 
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.DynamicGridLayout;
 
 public abstract class DisplayPanel extends JPanel
 {
-
+	
+	GridBagConstraints constraints = new GridBagConstraints();
+	
 	public DisplayPanel()
 	{
-		setLayout(new DynamicGridLayout(0, 1, 0, 3));
+		
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1;
+		constraints.gridx = 0;
+		constraints.insets = new Insets(0,0,6,0);
+		
+		setLayout(new GridBagLayout());
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setBorder(new EmptyBorder(0, 0, 0, 0));
 	}
+	
+	public void addItem(Component comp)
+	{
+		super.add(comp, constraints);
+	}
+	
+	
 
 }
