@@ -29,7 +29,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Provider;
