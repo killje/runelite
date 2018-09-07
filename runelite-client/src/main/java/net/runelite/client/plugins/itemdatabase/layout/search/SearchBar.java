@@ -25,6 +25,7 @@
  */
 package net.runelite.client.plugins.itemdatabase.layout.search;
 
+import com.google.common.cache.CacheLoader;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.itemdatabase.layout.ContentPanelWrapper;
 import net.runelite.client.plugins.itemdatabase.util.ArrayListModel;
@@ -43,6 +45,7 @@ import net.runelite.http.api.item.Item;
 import net.runelite.http.api.item.SearchResult;
 
 @Singleton
+@Slf4j
 public class SearchBar extends IconTextField implements ActionListener
 {
 
@@ -98,9 +101,10 @@ public class SearchBar extends IconTextField implements ActionListener
 			searchResults.addAll(searchResultItems);
 
 			setIcon(SEARCH_ICON);
-		} catch (ExecutionException ex)
+		} catch (ExecutionException | CacheLoader.InvalidCacheLoadException ex)
 		{
 			setIcon(ERROR_ICON);
+			log.error("Item search failed", ex);
 		}
 		
 	}

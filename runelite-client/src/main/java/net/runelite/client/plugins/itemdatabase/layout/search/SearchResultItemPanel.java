@@ -38,6 +38,7 @@ import javax.swing.event.MouseInputAdapter;
 import net.runelite.api.ItemComposition;
 import net.runelite.client.game.AsyncBufferedImage;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.itemdatabase.layout.item.ItemPanel;
 import net.runelite.client.plugins.itemdatabase.util.ListItemPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.http.api.item.Item;
@@ -51,6 +52,9 @@ public class SearchResultItemPanel extends ListItemPanel<Item>
 	@Inject
 	private ItemManager itemManager;
 	
+	@Inject
+	private ItemPanel itemPanel;
+	
 	public SearchResultItemPanel()
 	{
 	}
@@ -59,7 +63,6 @@ public class SearchResultItemPanel extends ListItemPanel<Item>
 	public void initializePanel(Item item)
 	{
 		ItemComposition itemComposition = itemManager.getItemComposition(item.getId());
-		
 		setLayout(new BorderLayout(0, 0));
 		setBackground(BACKGROUND_COLOR);
 		setBorder(new EmptyBorder(6, 6, 6, 6));
@@ -79,7 +82,7 @@ public class SearchResultItemPanel extends ListItemPanel<Item>
 		add(jLabel, BorderLayout.WEST);
 		add(new JLabel(itemComposition.getName()));
 		
-		addMouseListener(new MouseAdaptor(this));
+		addMouseListener(new MouseAdaptor(this, item, itemPanel));
 		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 	}
 
@@ -87,15 +90,20 @@ public class SearchResultItemPanel extends ListItemPanel<Item>
 	{
 
 		private final SearchResultItemPanel searchResultItemPanel;
+		private final Item item;
+		private final ItemPanel itemPanel;
 		
-		public MouseAdaptor(SearchResultItemPanel searchResultItemPanel)
+		public MouseAdaptor(SearchResultItemPanel searchResultItemPanel, Item item, ItemPanel itemPanel)
 		{
 			this.searchResultItemPanel = searchResultItemPanel;
+			this.item = item;
+			this.itemPanel = itemPanel;
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e)
 		{
+			itemPanel.showItem(item);
 		}
 		
 		@Override

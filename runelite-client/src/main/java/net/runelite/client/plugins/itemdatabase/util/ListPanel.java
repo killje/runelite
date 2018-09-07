@@ -104,6 +104,7 @@ public abstract class ListPanel<T> extends JScrollPane implements ArrayListChang
 		SwingUtilities.invokeLater(() ->
 		{
 			listPanel.remove(itemToRemove);
+			getVerticalScrollBar().setValue(getVerticalScrollBar().getMinimum());
 			updateUI();
 		});
 	}
