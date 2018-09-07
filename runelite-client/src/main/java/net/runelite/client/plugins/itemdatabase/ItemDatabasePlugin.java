@@ -35,7 +35,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.PluginInstantiationException;
@@ -71,28 +70,14 @@ public class ItemDatabasePlugin extends Plugin
 	@Inject
 	private RecipeManager recipeManager;
 
-
 	@Inject
 	private ClientThread clientThread;
 
 	@Inject
 	private Client client;
-
-	@Inject
-	private ItemDatabasePanel itemDatabasePanel;
 
 	@Inject
 	private ClientToolbar clientToolbar;
-
-	@Inject
-	private RecipeManager recipeManager;
-
-
-	@Inject
-	private ClientThread clientThread;
-
-	@Inject
-	private Client client;
 
 	private NavigationButton navButton;
 
