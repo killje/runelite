@@ -29,6 +29,7 @@ import com.google.common.eventbus.Subscribe;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -46,6 +47,7 @@ import net.runelite.client.plugins.itemdatabase.recipes.Recipe;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeGroup;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeItem;
 import net.runelite.client.plugins.itemdatabase.recipes.RecipeManager;
+import net.runelite.client.plugins.itemdatabase.search.ItemSearchManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -84,6 +86,9 @@ public class ItemDatabasePlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
+	@Inject
+	private ItemSearchManager itemSearchManager;
+
 	private NavigationButton navButton;
 
 	@Override
@@ -119,6 +124,15 @@ public class ItemDatabasePlugin extends Plugin
 		{
 			initRecipesManager();
 			clientToolbar.addNavigation(navButton);
+
+			clientThread.invokeLater(()-> {
+				log.info(itemSearchManager.search("Iron").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
+				log.info(itemSearchManager.search("Sword").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
+			});
 		}
 	}
 

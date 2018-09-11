@@ -25,44 +25,28 @@
  */
 package net.runelite.client.plugins.itemdatabase.util;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-public class SearchTrie
+public class TrieNode
 {
-	private SearchTrieNode root = new SearchTrieNode();
+	private Map<Character,TrieNode> children = new HashMap<>();
+	private Set<Integer> results = new HashSet<>();
 
-	public void insert(String word, int itemId) {
-		String lowerCaseWord = word.toLowerCase();
-		SearchTrieNode current = root;
-		current.addResults(itemId);
-
-		for (int i = 0; i < lowerCaseWord.length(); i++) {
-			current = current.getChildren()
-				.computeIfAbsent(lowerCaseWord.toLowerCase().charAt(i), c -> new SearchTrieNode());
-
-			current.addResults(itemId);
-		}
-	}
-
-	public Set<Integer> find(String word) {
-		String lowerCaseWord = word.toLowerCase();
-		SearchTrieNode current = root;
-		for (int i = 0; i < word.length(); i++) {
-			char ch = lowerCaseWord.charAt(i);
-			SearchTrieNode node = current.getChildren().get(ch);
-			if (node == null) {
-				return new HashSet<>();
-			}
-			current = node;
-		}
-		return current.getResults();
-	}
-
-	@VisibleForTesting
-	public SearchTrieNode getRoot()
+	public Map<Character, TrieNode> getChildren()
 	{
-		return root;
+		return children;
+	}
+
+	public Set<Integer> getResults()
+	{
+		return results;
+	}
+
+	public void addResults(int result)
+	{
+		results.add(result);
 	}
 }

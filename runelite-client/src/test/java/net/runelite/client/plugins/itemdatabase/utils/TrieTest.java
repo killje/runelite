@@ -26,8 +26,8 @@
 package net.runelite.client.plugins.itemdatabase.utils;
 
 import net.runelite.api.ItemID;
-import net.runelite.client.plugins.itemdatabase.util.SearchTrie;
-import net.runelite.client.plugins.itemdatabase.util.SearchTrieNode;
+import net.runelite.client.plugins.itemdatabase.util.Trie;
+import net.runelite.client.plugins.itemdatabase.util.TrieNode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -36,21 +36,21 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SearchTrieTest
+public class TrieTest
 {
 
 
 	@Test
 	public void testInsert()
 	{
-		SearchTrie trie = new SearchTrie();
+		Trie trie = new Trie();
 
-		SearchTrieNode rootNode = trie.getRoot();
+		TrieNode rootNode = trie.getRoot();
 		assertTrue("Your trie wasn't empty after initialization", rootNode != null && rootNode.getChildren().isEmpty());
 
 		String ironOre = "Iron ore";
 		trie.insert(ironOre, ItemID.IRON_ORE);
-		SearchTrieNode currentNode = rootNode;
+		TrieNode currentNode = rootNode;
 		int i = 0;
 		while (i < ironOre.length())
 		{
@@ -87,7 +87,7 @@ public class SearchTrieTest
 	@Test
 	public void testFind()
 	{
-		SearchTrie trie = new SearchTrie();
+		Trie trie = new Trie();
 		String ironOre = "Iron ore";
 		String ironBar = "Iron bar";
 
