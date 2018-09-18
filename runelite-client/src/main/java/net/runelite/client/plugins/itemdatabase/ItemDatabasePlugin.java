@@ -136,6 +136,18 @@ public class ItemDatabasePlugin extends Plugin
 				log.info(itemSearchManager.search("Sword").stream().map((Integer id) -> {
 					return itemManager.getItemComposition(id).getName();
 				}).collect(Collectors.toList()).toString());
+				log.info(itemSearchManager.search("Knife").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
+				log.info(itemSearchManager.search("Staff").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
+				log.info(itemSearchManager.search("Logs").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
+				log.info(itemSearchManager.search("Rune").stream().map((Integer id) -> {
+					return itemManager.getItemComposition(id).getName();
+				}).collect(Collectors.toList()).toString());
 			});
 		}
 	}
