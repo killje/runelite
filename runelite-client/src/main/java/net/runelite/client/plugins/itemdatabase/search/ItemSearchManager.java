@@ -84,7 +84,23 @@ public class ItemSearchManager
 		return itemTrie.find(s).stream().sorted((Integer id1, Integer id2) -> {
 			ItemComposition ic1 = itemManager.getItemComposition(id1);
 			ItemComposition ic2 = itemManager.getItemComposition(id2);
-			return ic1.getName().compareTo(ic2.getName()); //TODO change to a different string sorting comparator that uses the search string
+
+			if(ic1.getName().equals(ic2.getName()))
+			{
+				return 0;
+			}
+
+			if (ic1.getName().startsWith(s) && !ic2.getName().startsWith(s))
+			{
+				return -1;
+			}
+
+			if (ic2.getName().startsWith(s) && !ic1.getName().startsWith(s))
+			{
+				return 1;
+			}
+
+			return ic1.getName().compareTo(ic2.getName());
 		}).collect(Collectors.toList());
 	}
 }
