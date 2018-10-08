@@ -25,40 +25,69 @@
  */
 package net.runelite.client.plugins.itemdatabase.layout.search;
 
-import java.awt.Insets;
+import java.awt.Color;
+import java.awt.TextArea;
+import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.swing.border.EmptyBorder;
-import net.runelite.client.plugins.itemdatabase.layout.ContentPanelWrapper;
-import net.runelite.client.plugins.itemdatabase.util.ListPanel;
-import net.runelite.client.ui.ColorScheme;
-import net.runelite.http.api.item.Item;
+import net.runelite.api.ItemID;
+import net.runelite.client.RuneLite;
+import net.runelite.client.callback.ClientThread;
+import net.runelite.client.plugins.itemdatabase.layout.DisplayPanel;
+import net.runelite.client.plugins.itemdatabase.layout.DisplayPanelWrapper;
+import net.runelite.client.plugins.itemdatabase.layout.DisplayState;
+import net.runelite.client.plugins.itemdatabase.layout.DisplayStateManager;
 
 @Singleton
-public class SearchResultPanel extends ListPanel<Item>
+public class SearchResultPanel extends DisplayPanel
 {
-	
-	@Inject 
-	public SearchResultPanel(Provider<SearchResultItemPanel> searchResultItemPanelProvider, ContentPanelWrapper contentPanelWrapper)
+
+	@Inject
+	private ClientThread clientThread;
+
+	@Inject
+	private DisplayStateManager displayStateManager;
+
+	@Inject
+	private DisplayPanelWrapper displayPanelWrapper;
+
+	public SearchResultPanel()
 	{
-		super(searchResultItemPanelProvider);
-		
-		init(contentPanelWrapper);
+		TextArea panel = new TextArea();
+		panel.append("Good bye!");
+		panel.setBackground(Color.BLUE);
+		add(panel);
 	}
 
-	private void init(ContentPanelWrapper contentPanelWrapper)
+	public CompletableFuture search(String text)
 	{
-		contentPanelWrapper.addPanel(this, "SEARCH_RESULTS");
-		setBackground(ColorScheme.DARK_GRAY_COLOR);
-		setBorder(new EmptyBorder(0, 0, 0, 0));
-		
-		getListPanelWrapper().setBackground(ColorScheme.DARK_GRAY_COLOR);
-		getListPanel().setBackground(ColorScheme.DARK_GRAY_COLOR);
-		
-		getVerticalScrollBar().setBackground(ColorScheme.DARK_GRAY_COLOR);
-		
-		constraints.insets = new Insets(0,0,6,0);
+		displayStateManager.setDisplayState(DisplayState.RESULTS);
+		displayPanelWrapper.setDisplayPanel(RuneLite.getInjector().getInstance(DisplayPanel.class));
+		CompletableFuture<Integer> searchResultItems = new CompletableFuture<>();
+
+		clientThread.invokeLater(new Search(searchResultItems, text));
+		return searchResultItems;
+
+	}
+
+	private class Search implements Runnable
+	{
+
+		private final CompletableFuture<Integer> searchResultItems;
+		private final String searchText;
+
+		public Search(CompletableFuture<Integer> searchResultItems, String searchText)
+		{
+			this.searchResultItems = searchResultItems;
+			this.searchText = searchText;
+		}
+
+		@Override
+		public void run()
+		{
+			searchResultItems.complete(ItemID.IRON_ORE); // Amount of search results
+		}
+
 	}
 
 }
